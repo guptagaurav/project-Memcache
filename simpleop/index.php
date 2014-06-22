@@ -3,6 +3,11 @@
 require_once "dbconnect.php";
 include "functions.php";
 
+/* 
+	Including Functions.php file to test and run all the functionality that is 
+	Add an item, Delete an item, Edit and Update the item.
+*/
+
 if(isset($_POST['addm'])){
 	$check = add_item($_POST['name'],$_POST['comments']);
 	if(!$check){
