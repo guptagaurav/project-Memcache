@@ -18,8 +18,8 @@ Deleting an Item, Updating Item. */
 $memcache = new Memcache;
 $memcache->connect('localhost', 11211) or die ("Could not connect");
 
-																					/*  Checking the conditions if User has clicked on the button that adds */
-if(isset($_POST['addm'])){															/*  new Item to the Database */
+																	/*  Checking the conditions if User has clicked on the button that adds */
+if(isset($_POST['addm'])){											/*  new Item to the Database */
 	$check = add_item($_POST['name'],$_POST['comments']);							
 	if(!$check){
 		echo "<script>"."window.alert('Already in Database')"."</script>";			/*  If the item is already present in the database. Alert command get fired */
@@ -120,11 +120,11 @@ END;
 						continue;
 					}
 
-					if($resultn->num_rows==0){ 										/* Same if the resulted number rows returned is 0*/
+					if($resultn->num_rows==0){ 				/* Same if the resulted number rows returned is 0*/
 						$num++; 
 						continue;
 					}
-					else{															/* If it is a valid row then and Memcache is not set for that Key the set it */
+					else{									/* If it is a valid row then and Memcache is not set for that Key the set it */
 					$trace = $resultn->fetch_row(); 	
 					$memcache->set($key1,$trace, false , 500);
 					$row = $memcache->get($key1);
@@ -132,7 +132,7 @@ END;
 					}
 				
 					}
-					elseif($memcache->get("del1".$num)){							/* If an Item is deleted then delete its entry from Memcache pool as well.*/
+					elseif($memcache->get("del1".$num)){	/* If an Item is deleted then delete its entry from Memcache pool as well.*/
 						echo "eneter";
 						$del1 = "del1".$num;
 						$memcache->delete($del1);
@@ -141,12 +141,12 @@ END;
 						continue;
 					}
 					else{
-						$row = $memcache->get($key1);								/* If the memcache is Set for then query from it instead of going to Database */
+						$row = $memcache->get($key1);		/* If the memcache is Set for then query from it instead of going to Database */
 					}
 
 			
 
-				if(isset($_GET['id']) && $row[0] == $_GET['id']){					/* If edit button is clicked set and ID as a GET Request */
+				if(isset($_GET['id']) && $row[0] == $_GET['id']){	/* If edit button is clicked set and ID as a GET Request */
 				
 			
 echo<<<END
@@ -180,10 +180,10 @@ END;
 				$i++;
 			}
 
-			$result->free();				/* It is advisable to free any value. This will free up some system resources */
+			$result->free();	/* It is advisable to free any value. This will free up some system resources */
 
 
-			if(isset($_POST['add'])){
+			if(isset($_POST['add'])){      /* If a New Entry is to be created and Displayed on webpage. */
 echo<<<END
 				<tr>
 				<td width="5%">$i</td>
@@ -206,6 +206,11 @@ echo<<<END
 			<td><input type="submit" name="add" value="ADD"></td>
 			</tbody>
 </table>
+
+/*
+	Some scripts to check to check whether the User is submitting a entry with a empty field.
+*/
+
 
 <script>
 function test(){
