@@ -37,14 +37,6 @@ CREATE TABLE IF NOT EXISTS `items` (
 -- Dumping data for table `items`
 --
 
-INSERT INTO `items` (`id`, `Name`, `Comments`) VALUES
-(9, 'vsdv', 'vfgffg'),
-(11, 'csdcds', 'vffvtrt'),
-(13, 'fsfds', 'sdfdsf'),
-(16, 'sdcds', 'gaurav'),
-(17, 'csfsd', 'sfsdfsd'),
-(18, 'gaurav', 'gupta'),
-(20, 'dsf', 'fsdfsd');
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
