@@ -95,63 +95,58 @@ echo<<<END
 END;
 				$i = 1;
 
-				$querynum = $query." ORDER BY `id` DESC LIMIT 1;";
+				$querynum = $query." ORDER BY `id` DESC LIMIT 1;";			/* Quering the database to get the ID of the last that is present */
 				$resultnum = $db->query($querynum);
-				$resultfetch= $resultnum->fetch_object();
-				$max = $resultfetch->id;
-
-				$result = $db->query($query);
-				if($result->num_rows==0){
-					echo "bye";
-					die;
-				}
-				$trace = $result->fetch_row();
 				
+				$if(!$resultfetch= $resultnum->fetch_object()){
+					$max = 0;												/* If search query resulted in no match Or The Database is empty. Then don't display*/
+
+				}
+				else $max = $resultfetch->id;
+				
+				$result = $db->query($query);												
+				$trace = $result->fetch_row();
 				$num = $trace[0];
 
-				// echo "ROWS: ".$max."</br>";
-				// $memcache->delete("key1".$trace[0]);
-
-				while($num<=$max){
-					// echo "ID: ".$num." ";
+				while($num<=$max){											/* Looping through the queries to fill memcache pool if It isn't set */
+				
 					$key1 = "key1".$num;
-					// echo "</br>".$key1."</br>";
-					if(!$memcache->get($key1) && !($memcache->get("del1".$num))){
-						// echo "SJNJNJCDC"."</br>";
-					$querytrace = $query." WHERE `id` = $num";
-					if(!$resultn = $db->query($querytrace)){
-						$num++;
+				
+					if(!$memcache->get($key1) && !($memcache->get("del1".$num))){    /* When memcache for that Key is not set up OR not take the ID of the field */
+					$querytrace = $query." WHERE `id` = $num";						 /* that has been deleted. */
+
+					if(!$resultn = $db->query($querytrace)){						/* If the query got is invalid for that ID then jump to the loop starting */
+						$num++;														/* with an incremented $num */
 						continue;
 					}
-					if($resultn->num_rows==0){ $num++; continue;}
-					else{
+
+					if($resultn->num_rows==0){ 										/* Same if the resulted number rows returned is 0*/
+						$num++; 
+						continue;
+					}
+					else{															/* If it is a valid row then and Memcache is not set for that Key the set it */
 					$trace = $resultn->fetch_row(); 	
 					$memcache->set($key1,$trace, false , 500);
 					$row = $memcache->get($key1);
-					// echo $row[2]."</br>";
-				}
-					// $trace = $result->fetch_row();
+				
 					}
-					elseif($memcache->get("del1".$num)){
+				
+					}
+					elseif($memcache->get("del1".$num)){							/* If an Item is deleted then delete its entry from Memcache pool as well.*/
 						echo "eneter";
 						$del1 = "del1".$num;
 						$memcache->delete($del1);
 						$memcache->delete($key1);
-						// echo "<script>"."window.alert('AREE')"."</script>";
 						$num++;
-						// $memcache->delete("del1".$num);
 						continue;
 					}
 					else{
-						$row = $memcache->get($key1);
-						// echo "Changed :".$row[2]."</br>";
+						$row = $memcache->get($key1);								/* If the memcache is Set for then query from it instead of going to Database */
 					}
 
-					// $memcache->delete($key1);
-					// $memcache->delete($key1);
 			
 
-				if(isset($_GET['id']) && $row[0] == $_GET['id']){
+				if(isset($_GET['id']) && $row[0] == $_GET['id']){					/* If edit button is clicked set and ID as a GET Request */
 				
 			
 echo<<<END
@@ -167,13 +162,7 @@ echo<<<END
 				</form>
 				</tr>
 END;
-				// $row = $result->fetch_row();
-				// $i++;
-				// $num++;
-				// $querytrace = $query." WHERE `id` = $num";
-				// $resultn = $db->query($querytrace);
-				// $row = $resultn->fetch_row();
-				}else{
+				}else{   /* Else go on carrying with Displaying the rest of the rows. */
 				
 				
 echo<<<END
@@ -191,7 +180,9 @@ END;
 				$i++;
 			}
 
-			$result->free();
+			$result->free();				/* It is advisable to free any value. This will free up some system resources */
+
+
 			if(isset($_POST['add'])){
 echo<<<END
 				<tr>
