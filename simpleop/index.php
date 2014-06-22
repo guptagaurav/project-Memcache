@@ -3,36 +3,48 @@
 require_once "dbconnect.php";
 include "functions.php";
 
+/* Including dbconnect.php to connect to the database. */
+
+/* Including functions.php to carry out the functionality Like Adding an Item
+Deleting an Item, Updating Item. */
+
+
+/*
+	Using Memcache as caching domain to reduce user's trip to Database to query the results 
+	which were queried earlier.
+*/
+
+
 $memcache = new Memcache;
 $memcache->connect('localhost', 11211) or die ("Could not connect");
 
-
-if(isset($_POST['addm'])){
-	$check = add_item($_POST['name'],$_POST['comments']);
+																					/*  Checking the conditions if User has clicked on the button that adds */
+if(isset($_POST['addm'])){															/*  new Item to the Database */
+	$check = add_item($_POST['name'],$_POST['comments']);							
 	if(!$check){
-		echo "<script>"."window.alert('Already in Database')"."</script>";
-	}
-	header('Location:index.php');
+		echo "<script>"."window.alert('Already in Database')"."</script>";			/*  If the item is already present in the database. Alert command get fired */
+	}																				/*  up specifying the fields are already present in the database */
+	header('Location:index.php');		
 }
 
-if(isset($_POST['update'])){
-	$checkedit = update_item($_POST['editname'],$_POST['editcomments'],$_GET['id'],$memcache);
+if(isset($_POST['update'])){																		/*  Same for Updating an entry in database */
+	$checkedit = update_item($_POST['editname'],$_POST['editcomments'],$_GET['id'],$memcache);	
 	if(!$checkedit){
-		echo "<script>"."window.alert('CANNOT PERFORM THIS ACTION')"."</script>";
-	}
+		echo "<script>"."window.alert('CANNOT PERFORM THIS ACTION')"."</script>";                   /*  If the item is already present in the database or Someone */
+	}																								/*  deletes that item before updating it. The item wouldn't be updated. */
 	header('Location:index.php');
 }
 
-if(isset($_POST['cancel'])){
+if(isset($_POST['cancel'])){             /* Code to cancel the current operation */
 	header('location:index.php');	
 }
 
-if(isset($_GET['delid'])){
+if(isset($_GET['delid'])){				 /* Code to delete an item and reset that memcache key that corresponded to that item */
 	delete_item($_GET['delid'],$memcache);
 	header('Location:index.php');
 }
 
-if(!isset($_GET['searchquery'])){
+if(!isset($_GET['searchquery'])){        /* Code to search an item. It is not a dynamic Search since that would require repeated Ajax calls to Database*/
 $query = " SELECT * from `items` ";
 }
 else
@@ -41,7 +53,11 @@ else
 }
 
 
+/*
 
+HTML PART 
+
+*/
 
 
 echo<<<END
