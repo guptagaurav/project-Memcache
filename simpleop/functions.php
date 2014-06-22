@@ -8,8 +8,8 @@ function add_item($name, $comments){
 
 	$querycheck = "SELECT * FROM `items` WHERE `name`='$name' and `comments`='$comments'";
 	$resultcheck = $db->query($querycheck);
-
-	if($resultcheck->num_rows>0){
+	$counter = $resultcheck->num_rows;
+	if($counter>0){
 		return false;
 	}
 
@@ -23,23 +23,38 @@ function add_item($name, $comments){
 }
 
 
-function update_item($name_update, $comments_update,$id){
+function update_item($name_update, $comments_update,$id,$memcahce){
 	require 'dbconnect.php';
 
 	$name_update = $db->escape_string($name_update);
 	$comments_update = $db->escape_string($comments_update);
+
+	$queryfirstcheck = "SELECT `id` FROM `items` WHERE `id`=$id";
+	if(!$resultfirstcheck=$db->query($queryfirstcheck)){
+		return false;
+	}
+
+	$querycheck = "SELECT * FROM `items` WHERE `name`='$name_update' and `comments`='$comments_update'";
+	$resultcheck = $db->query($querycheck);
+	$counter = $resultcheck->num_rows;
+	if($counter>0){
+		return false;
+	}
+
 	$queryupdate = "UPDATE `items` SET `name` = '$name_update' , `comments`='$comments_update' WHERE `id` = $id ";
 
 	if(!$resultupdate = $db->query($queryupdate)){
 	die('There was an error running the query [' . $db->error . ']');
 	}
+	$key1 = "key1".$id;
+	$memcahce->delete($key1);
 	// else $resultupdate->free();
 	return true;
 
 
 }
 
-function delete_item($del_id){
+function delete_item($del_id,$memcahce){
 	require 'dbconnect.php';
 
 	$querydel = "DELETE FROM `items` where `id` = $del_id" ;
@@ -63,6 +78,8 @@ function delete_item($del_id){
 		array_push($arr, $i-1);
 		// $t++;
 	}
+	$del1 = "del1".$del_id;
+	$memcahce->set($del1,1,false,500);
 	
 	echo "". implode(",",$arr)."'<br>'";
 
@@ -75,9 +92,9 @@ function delete_item($del_id){
 
 
 
-function search_item($string){
+function search_item($string,$memcache){
 	require 'dbconnect.php';
-	$string = $db->escape_String($string);
+	$string = $db->escape_string($string);
 
 	$query = "SELECT * FROM `items` WHERE `name` LIKE '%$string%' OR `comments` LIKE '%$string%'";
 
@@ -85,7 +102,9 @@ function search_item($string){
 		die('There was an error running the query [' . $db->error . ']');
 	}
 
-	return $result;
+	$memcache->set("search",1,false,500);
+
+	return $query;
 
 }
 
